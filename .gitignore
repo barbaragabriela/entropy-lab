@@ -1,0 +1,5 @@
+# Python byte code
+*.pyc
+
+# Ignore corpus files
+corpus
