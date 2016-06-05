@@ -42,7 +42,7 @@ def getTaggedWordsFromFile(inF):
     words=[]
     for line in lines:
         word,pos = line.split('\t')
-        words.append((word,pos))
+        words.append((word,pos.strip()))
     print len(words),'tagged words read'
     return words
 
