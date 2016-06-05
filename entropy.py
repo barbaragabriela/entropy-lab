@@ -8,7 +8,7 @@ def compute_models():
   total_words = float(len(words))
 
   U, B, T = auxiliar.countNgrams(words,0, 0)
-  
+
   u_prob = helper.unigram_prob(U,total_words)
   b_prob, b_posibilities = helper.bigram_prob(B,U)
   t_prob, t_posibilities = helper.trigram_prob(T,B)
@@ -82,7 +82,7 @@ def smooth_trigram():
     u_prob = helper.unigram_prob(Up,float(aux))
     b_prob, b_posibilities = helper.bigram_prob(Bpx, Up)
     t_prob, t_posibilities = helper.trigram_prob(Tpxx,Bpx)
-    
+
     t_h = helper.trigram_model(Up, b_posibilities, t_posibilities, u_prob, b_prob, t_prob)
     pp = helper.perplexity(t_h)
     print '<X\',Y,Z>'
@@ -93,7 +93,7 @@ def smooth_trigram():
     u_prob = helper.unigram_prob(Up,float(aux))
     b_prob, b_posibilities = helper.bigram_prob(Bpp, Up)
     t_prob, t_posibilities = helper.trigram_prob(Tppx,Bpp)
-    
+
     t_h = helper.trigram_model(Up, b_posibilities, t_posibilities, u_prob, b_prob, t_prob)
     pp = helper.perplexity(t_h)
     print '<X\',Y\',Z>'
@@ -103,7 +103,7 @@ def smooth_trigram():
 
     i += 1
     aux = aux / 2
-  
+
 
 def run():
   option = ""

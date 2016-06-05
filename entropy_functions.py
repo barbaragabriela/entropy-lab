@@ -1,6 +1,11 @@
 import numpy as np
+from collections import defaultdict
 
 def unigram_prob(unigram_dict, total_words):
+  '''
+  from a list of unigrams with the count of their ocurrences
+  it returns the probability of each unigram
+  '''
   probs = {}
   for word in unigram_dict:
     probability = unigram_dict[word] / total_words
@@ -10,24 +15,41 @@ def unigram_prob(unigram_dict, total_words):
 
 
 def bigram_prob(bigram_dict, unigrams):
+  '''
+  from a list of bigrams with the count of their ocurrences
+  it returns the probability of each bigram and a dictionary with
+  the posible combinations for each word, e.g. { 'the': ['pets', 'dogs'] }
+  '''
   probs = {}
+  b_posibilities = defaultdict(list)
   for bigram in bigram_dict:
+    b_posibilities[bigram[0]].append(bigram[1])
     probability = bigram_dict[bigram] / float(unigrams[bigram[0]])
     probs[bigram] = probability
 
-  return probs
+  return probs, b_posibilities
 
 
 def trigram_prob(trigram_dict, bigrams):
+  '''
+  from a list of trigrams with the count of their ocurrences
+  it returns the probability of each trigram and a dictionary with
+  the posible combinations for each word, e.g. { ('I', 'am'): ['Barbara', 'tall', 'Mexican'] }
+  '''
   probs = {}
+  t_posibilities = defaultdict(list)
   for trigram in trigram_dict:
+    t_posibilities[trigram[0], trigram[1]].append(trigram[2])
     probability = trigram_dict[trigram] / float(bigrams[trigram[0],trigram[1]])
     probs[trigram] = probability
 
-  return probs
+  return probs, t_posibilities
 
 
 def unigram_model(words, probs):
+  '''
+  function that returns the unigram entropy
+  '''
   h = 0.0
   for word in words:
     p = probs[word]
