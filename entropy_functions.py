@@ -58,31 +58,109 @@ def unigram_model(words, probs):
   return (-1 * h)
 
 
-def bigram_model(unigrams, bigrams, u_probs, b_probs):
+def bigram_model(unigrams, b_posibilities, u_probs, b_probs):
+  '''
+  function that returns the bigram entropy using the unigram and bigram probabilities.
+  '''
   h = 0.0
   for unigram in unigrams:
     pb = 0.0
-    for bigram in bigrams:
-      if bigram[0] == unigram:
-        p = b_probs[bigram]
-        pb += p * np.log2(p)
+    posibilities = b_posibilities[unigram]
+    for pos in posibilities:
+      p = b_probs[(unigram, pos)]
+      pb += p * np.log2(p)
     h += pb * u_probs[unigram]
 
   return (-1 * h)
 
-def trigram_model(unigrams, bigrams, trigrams, u_probs, b_probs, t_probs):
+
+def trigram_model(unigrams, b_posibilities, t_posibilities, u_probs, b_probs, t_probs):
+  '''
+  function that returns the trigram entropy using the unigram, bigram and trigram probabilities.
+  '''
   h = 0.0
   for unigram in unigrams:
     pb = 0.0
-    for bigram in bigrams:
+    b_pos = b_posibilities[unigram]
+    for b_p in b_pos:
       pt = 0.0
-      if bigram[0] == unigram:
-        p = b_probs[bigram]
-        for trigram in trigrams:
-          if (trigram[0],trigram[1]) == bigram:
-            paux = t_probs[trigram]
-            pt += paux * np.log2(paux)
-        pb += p * pt
+      p = b_probs[(unigram, b_p)]
+      t_pos = t_posibilities[(unigram, b_p)]
+      for t_p in t_pos:
+        paux = t_probs[(unigram, b_p, t_p)]
+        pt += paux * np.log2(paux)
+      pb += p * pt
     h += pb * u_probs[unigram]
   
   return (-1 * h)
+
+
+def perplexity(h):
+  '''
+  simple function that returns the perplexity given an entropy
+  '''
+  return np.power(2, h)
+
+
+def smooth_countNgrams(l, x, inic, end=0):
+    """
+    From a list l (of words or pos), an inic position and an end position
+    a tuple(U,B,T,Up,Bpx,Bpp,Tpxx,Tppx) of dics corresponding to unigrams, bigrams and trigrams are built
+    """
+    if end == 0:
+        end = len(l)
+    U = {}
+    B = {}
+    T = {}
+    Up = {}
+    Bpx = {}
+    Bpp = {}
+    Tpxx = {}
+    Tppx = {}
+    U[(l[inic][0])] = 1
+    Up[(l[inic][1])] = 1
+    if (l[inic+1][0]) not in U:
+      U[(l[inic+1][0])] = 1
+    else:
+      U[(l[inic+1][0])] += 1
+    if (l[inic+1][1]) not in Up:
+      Up[(l[inic+1][1])] = 1
+    else:
+      Up[(l[inic+1][1])] += 1
+    B[(l[inic][0],l[inic+1][0])] = 1
+    Bpx[(l[inic][1],l[inic+1][0])] = 1
+    Bpp[(l[inic][1],l[inic+1][1])] = 1
+    for i in range(inic + 2,end):
+      if (l[i][0]) not in U:
+        U[(l[i][0])] = 1
+      else:
+        U[(l[i][0])] += 1
+      if (l[i][1]) not in Up:
+        Up[(l[i][1])] = 1
+      else:
+        Up[(l[i][1])] += 1
+      if (l[i-1][0],l[i][0]) not in B:
+        B[(l[i-1][0],l[i][0])] = 1
+      else:
+        B[(l[i-1][0],l[i][0])] += 1
+      if (l[i-1][1],l[i][0]) not in Bpx:
+        Bpx[(l[i-1][1],l[i][0])] = 1
+      else:
+        Bpx[(l[i-1][1],l[i][0])] += 1
+      if (l[i-1][1],l[i][1]) not in Bpp:
+        Bpp[(l[i-1][1],l[i][1])] = 1
+      else:
+        Bpp[(l[i-1][1],l[i][1])] += 1
+      if (l[i-2][0],l[i-1][0],l[i][0]) not in T:
+        T[(l[i-2][0],l[i-1][0],l[i][0])] = 1
+      else:
+        T[(l[i-2][0],l[i-1][0],l[i][0])] += 1
+      if (l[i-2][1],l[i-1][0],l[i][0]) not in Tpxx:
+        Tpxx[(l[i-2][1],l[i-1][0],l[i][0])] = 1
+      else:
+        Tpxx[(l[i-2][1],l[i-1][0],l[i][0])] += 1
+      if (l[i-2][1],l[i-1][1],l[i][0]) not in Tppx:
+        Tppx[(l[i-2][1],l[i-1][1],l[i][0])] = 1
+      else:
+        Tppx[(l[i-2][1],l[i-1][1],l[i][0])] += 1
+    return (U,B,T,Up,Bpx,Bpp,Tpxx,Tppx)
