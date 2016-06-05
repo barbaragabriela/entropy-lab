@@ -2,4 +2,4 @@
 *.pyc
 
 # Ignore corpus files
-corpus
+corpora
